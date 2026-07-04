@@ -1,7 +1,7 @@
 // Guarda el score de un jugador y devuelve el percentil real.
 // Input: POST { score, categoria, perfil }
 // Output: { percentil: number | null, total: number }
-// Si hay menos de 100 registros, devuelve percentil: null (el frontend usa el simulado).
+// Si hay menos de 1000 registros, devuelve percentil: null (el frontend usa el simulado).
 //
 // País: se captura sin fricción de UI en el flujo solitario (sin grupo), vía el
 // header de geolocalización de Vercel (x-vercel-ip-country). No se usa para
@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     const total = parseInt(existing.total);
     const percentil =
-      total >= 100
+      total >= 1000
         ? Math.round((parseFloat(existing.below) / total) * 100)
         : null;
 

@@ -114,8 +114,8 @@ Distribución de perfiles esperada (simulada):
 
 ## Percentil
 
-- Etapa 1 (< 100 registros en Neon): percentil simulado con distribución hardcodeada en `calcularPercentil()` (tabla de arriba)
-- Etapa 2 (≥ 100 registros): percentil real desde Neon, misma frase al usuario
+- Etapa 1 (< 1000 registros en Neon): percentil simulado con distribución hardcodeada en `calcularPercentil()` (tabla de arriba)
+- Etapa 2 (≥ 1000 registros): percentil real desde Neon, misma frase al usuario
 - Sin offset (a diferencia de quetantermo, que sumaba +1000 por jugadores pre-Neon)
 - Framing positivo: score alto → "Eres más fanático que el X%"; score bajo → "Eres menos fanático que el X%"
 
