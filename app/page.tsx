@@ -982,7 +982,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
         </p>
 
         <div style={{ textAlign: "center", marginTop: 24, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>
             Hecho por Mariano Gusis
           </p>
           <a href="https://www.linkedin.com/in/mariano-gusis" target="_blank" rel="noopener noreferrer"
