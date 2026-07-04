@@ -49,8 +49,7 @@ export default function RootLayout({
         {children}
         <Analytics />
       </body>
-      {/* TODO: reemplazar por el GA_ID propio de quetanfanatico cuando se cree la property */}
-      <GoogleAnalytics gaId="G-XXXXXXXXXX" />
+      <GoogleAnalytics gaId="G-9XYFDXKVYW" />
     </html>
   );
 }
