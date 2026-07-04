@@ -4,7 +4,7 @@ import { track } from "@vercel/analytics";
 import { sendGAEvent } from "@next/third-parties/google";
 
 // ─── DATASET ───────────────────────────────────────────────────────────────
-// 30 preguntas — versión genérica (Latino-Ibero-Americana), separada del dataset
+// 30 preguntas - versión genérica (Latino-Ibero-Americana), separada del dataset
 // argentino de quetantermo. Ver FANATICO-CONTENIDO-DRAFT.md (sección 4) para el
 // detalle de por qué se adaptó cada una.
 
@@ -299,12 +299,9 @@ function Landing({ onStart }: any) {
 
       <div style={{ maxWidth: 440, width: "100%", textAlign: "center", transition: "opacity 0.6s ease, transform 0.6s ease", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(20px)" }}>
 
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 99, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.08)", marginBottom: 8, fontSize: 11, color: "#f87171", fontFamily: "var(--font-mono)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 14px", borderRadius: 99, border: "1px solid rgba(239,68,68,0.3)", background: "rgba(239,68,68,0.08)", marginBottom: 20, fontSize: 11, color: "#f87171", fontFamily: "var(--font-mono)", letterSpacing: "0.12em", textTransform: "uppercase" }}>
           ⚽ TEST FUTBOLERO 🏆
         </div>
-        <p style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#475569", letterSpacing: "0.1em", marginBottom: 20, textTransform: "uppercase" }}>
-          Mundial 2026
-        </p>
 
         <h1 style={{ fontFamily: "var(--font-display)", fontSize: "clamp(42px, 12vw, 72px)", fontWeight: 900, lineHeight: 1, margin: "0 0 8px", letterSpacing: "-0.02em", background: "linear-gradient(135deg, #ffffff 0%, #f97316 50%, #ef4444 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
           ¿QUÉ TAN<br />FANÁTICO ERES?
@@ -525,12 +522,28 @@ function Resultado({ respuestas, onReiniciar }: any) {
   const dimsParaMostrar = ["Pasión", "Nostalgia", "Romanticismo", "Resultadismo", "Modernidad", "Racionalidad"]
     .map(k => ({ label: k, value: normalized[k] || 0, color: (dimColors as any)[k] }));
 
-  const FLAGS: Record<string, string> = {
-    Argentina: "🇦🇷", Bolivia: "🇧🇴", Chile: "🇨🇱", Colombia: "🇨🇴", "Costa Rica": "🇨🇷",
-    Cuba: "🇨🇺", Ecuador: "🇪🇨", "El Salvador": "🇸🇻", España: "🇪🇸", "Estados Unidos": "🇺🇸",
-    Guatemala: "🇬🇹", Honduras: "🇭🇳", México: "🇲🇽", Nicaragua: "🇳🇮", Panamá: "🇵🇦",
-    Paraguay: "🇵🇾", Perú: "🇵🇪", "Puerto Rico": "🇵🇷", "República Dominicana": "🇩🇴",
-    Uruguay: "🇺🇾", Venezuela: "🇻🇪",
+  // Códigos ISO para banderas vía flagcdn.com - usamos imágenes en vez de emoji
+  // porque los emoji de bandera no se renderizan como bandera en Windows (se ven
+  // como las dos letras del código, ej. "NI"). Con imagen se ve igual en todos lados.
+  const PAIS_CODE: Record<string, string> = {
+    Argentina: "ar", Bolivia: "bo", Chile: "cl", Colombia: "co", "Costa Rica": "cr",
+    Cuba: "cu", Ecuador: "ec", "El Salvador": "sv", España: "es", "Estados Unidos": "us",
+    Guatemala: "gt", Honduras: "hn", México: "mx", Nicaragua: "ni", Panamá: "pa",
+    Paraguay: "py", Perú: "pe", "Puerto Rico": "pr", "República Dominicana": "do",
+    Uruguay: "uy", Venezuela: "ve",
+  };
+  const BanderaPais = ({ pais }: { pais?: string }) => {
+    const code = pais ? PAIS_CODE[pais] : null;
+    if (!code) return null;
+    return (
+      <img
+        src={`https://flagcdn.com/24x18/${code}.png`}
+        alt={pais}
+        width={18}
+        height={14}
+        style={{ borderRadius: 2, marginRight: 8, flexShrink: 0, verticalAlign: "middle" }}
+      />
+    );
   };
 
   const SITE_URL = "https://quetanfanatico.com";
@@ -546,6 +559,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
   const [grupoId, setGrupoId] = useState<string | null>(null);
   const [jugadorNombre, setJugadorNombre] = useState<string | null>(null);
   const [ultimoGrupoCreado, setUltimoGrupoCreado] = useState<string | null>(null);
+  const [grupoCreado, setGrupoCreado] = useState(false);
 
   const crearGrupo = async () => {
     const nombre = nombreCreador.trim();
@@ -562,11 +576,17 @@ function Resultado({ respuestas, onReiniciar }: any) {
       });
       const { grupo_id } = await res.json();
       const grupoUrl = `https://quetanfanatico.com/grupo/${grupo_id}`;
-      const texto = `Saqué ${fanatismoScore}/100 en "¿Qué tan fanático eres?" 🔥\nPerfil: ${perfil.nombre}\n\n¿Puedes superarme? Entra al ranking del grupo:\n${grupoUrl}`;
+      const nombreGrupoLimpio = nombreGrupo.trim();
+      const nombreGrupoCap = nombreGrupoLimpio
+        ? nombreGrupoLimpio.charAt(0).toUpperCase() + nombreGrupoLimpio.slice(1)
+        : "";
+      const referenciaRanking = nombreGrupoCap ? `el ranking de "${nombreGrupoCap}"` : "el ranking del grupo";
+      const texto = `Saqué ${fanatismoScore}/100 en "¿Qué tan fanático eres?" 🔥\nPerfil: ${perfil.nombre}\n\n¿Puedes superarme? Entra a ${referenciaRanking}:\n${grupoUrl}`;
       track("compartido", { canal: "whatsapp_grupo", perfil: perfil.id, score: fanatismoScore });
       sendGAEvent("event", "compartido", { canal: "whatsapp_grupo", perfil: perfil.id, score: fanatismoScore });
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
-      setUltimoGrupoCreado(nombreGrupo.trim() || "tu grupo");
+      setUltimoGrupoCreado(nombreGrupoCap || null);
+      setGrupoCreado(true);
       setNombreGrupo("");
     } catch (e) {
       console.error(e);
@@ -577,6 +597,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
 
   const crearOtroGrupo = () => {
     setUltimoGrupoCreado(null);
+    setGrupoCreado(false);
     setCreandoGrupo(true);
   };
 
@@ -711,10 +732,10 @@ function Resultado({ respuestas, onReiniciar }: any) {
           <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#64748b", marginBottom: 16 }}>
             Crea un ranking grupal, mándales el link y que lo demuestren.
           </p>
-          {ultimoGrupoCreado ? (
+          {grupoCreado ? (
             <div>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#4ade80", marginBottom: 12 }}>
-                ✓ Grupo "{ultimoGrupoCreado}" creado y compartido
+                {ultimoGrupoCreado ? `✓ Grupo "${ultimoGrupoCreado}" creado y compartido` : "✓ Grupo creado y compartido"}
               </p>
               <button onClick={crearOtroGrupo} style={{
                 width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer",
@@ -754,8 +775,8 @@ function Resultado({ respuestas, onReiniciar }: any) {
                   fontFamily: "var(--font-body)", fontSize: 16, color: paisCreador ? "#f1f5f9" : "#64748b", marginBottom: 10,
                 }}
               >
-                <option value="">Tu país (opcional)</option>
-                {PAISES.map((p) => <option key={p} value={p}>{p}</option>)}
+                <option value="" style={{ color: "#111827" }}>Tu país (opcional)</option>
+                {PAISES.map((p) => <option key={p} value={p} style={{ color: "#111827" }}>{p}</option>)}
               </select>
               <input
                 value={nombreGrupo}
@@ -769,8 +790,11 @@ function Resultado({ respuestas, onReiniciar }: any) {
                   fontFamily: "var(--font-body)", fontSize: 16, color: "#f1f5f9", marginBottom: 6,
                 }}
               />
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#64748b", marginBottom: 6, textAlign: "left" }}>
+                Puedes crear más de un grupo - repite este paso las veces que quieras (familia, amigos, trabajo, etc.)
+              </p>
               <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#64748b", marginBottom: 10, textAlign: "left" }}>
-                Puedes crear más de un grupo — repite este paso las veces que quieras (familia, amigos, trabajo, etc.)
+                Ojo: el link queda abierto - cualquiera que lo tenga puede entrar cuando quiera y ver el ranking completo de todos los que ya jugaron.
               </p>
               <button onClick={crearGrupo} disabled={!nombreCreador.trim() || creandoGrupoLoading} style={{
                 width: "100%", padding: "16px", borderRadius: 12, border: "none",
@@ -846,7 +870,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
         {grupoId && grupoScores.length > 0 && (
           <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 24 }}>
             <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16 }}>
-              🏆 RANKING DE FANATISMO DEL GRUPO — {grupoScores.length} jugador{grupoScores.length !== 1 ? "es" : ""}
+              🏆 RANKING DE FANATISMO DEL GRUPO - {grupoScores.length} jugador{grupoScores.length !== 1 ? "es" : ""}
             </div>
             {grupoScores.map((s: any, i: number) => {
               const cat = getCategoria(s.score);
@@ -856,8 +880,9 @@ function Resultado({ respuestas, onReiniciar }: any) {
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: i === 0 ? "#f97316" : "#475569", width: 24, textAlign: "center", flexShrink: 0 }}>
                     {i === 0 ? "🥇" : `#${i + 1}`}
                   </div>
-                  <div style={{ flex: 1, fontFamily: "var(--font-body)", fontSize: 14, color: esYo ? "#f97316" : "#e2e8f0", fontWeight: esYo ? 600 : 400 }}>
-                    {s.pais && FLAGS[s.pais] ? `${FLAGS[s.pais]} ` : ""}{s.player_name}{esYo ? " (tú)" : ""}
+                  <div style={{ flex: 1, display: "flex", alignItems: "center", fontFamily: "var(--font-body)", fontSize: 14, color: esYo ? "#f97316" : "#e2e8f0", fontWeight: esYo ? 600 : 400 }}>
+                    <BanderaPais pais={s.pais} />
+                    {s.player_name}{esYo ? " (tú)" : ""}
                   </div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, width: 60, flexShrink: 0 }}>
                     <span style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: cat.color }}>{s.score}</span>

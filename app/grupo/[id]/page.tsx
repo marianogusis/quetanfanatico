@@ -23,13 +23,30 @@ const PAISES = [
   "Paraguay", "Perú", "Puerto Rico", "República Dominicana", "Uruguay", "Venezuela", "Otro",
 ];
 
-const FLAGS: Record<string, string> = {
-  Argentina: "🇦🇷", Bolivia: "🇧🇴", Chile: "🇨🇱", Colombia: "🇨🇴", "Costa Rica": "🇨🇷",
-  Cuba: "🇨🇺", Ecuador: "🇪🇨", "El Salvador": "🇸🇻", España: "🇪🇸", "Estados Unidos": "🇺🇸",
-  Guatemala: "🇬🇹", Honduras: "🇭🇳", México: "🇲🇽", Nicaragua: "🇳🇮", Panamá: "🇵🇦",
-  Paraguay: "🇵🇾", Perú: "🇵🇪", "Puerto Rico": "🇵🇷", "República Dominicana": "🇩🇴",
-  Uruguay: "🇺🇾", Venezuela: "🇻🇪",
+// Códigos ISO para banderas vía flagcdn.com - usamos imágenes en vez de emoji
+// porque los emoji de bandera no se renderizan como bandera en Windows (se ven
+// como las dos letras del código, ej. "NI"). Con imagen se ve igual en todos lados.
+const PAIS_CODE: Record<string, string> = {
+  Argentina: "ar", Bolivia: "bo", Chile: "cl", Colombia: "co", "Costa Rica": "cr",
+  Cuba: "cu", Ecuador: "ec", "El Salvador": "sv", España: "es", "Estados Unidos": "us",
+  Guatemala: "gt", Honduras: "hn", México: "mx", Nicaragua: "ni", Panamá: "pa",
+  Paraguay: "py", Perú: "pe", "Puerto Rico": "pr", "República Dominicana": "do",
+  Uruguay: "uy", Venezuela: "ve",
 };
+
+function BanderaPais({ pais }: { pais?: string }) {
+  const code = pais ? PAIS_CODE[pais] : null;
+  if (!code) return null;
+  return (
+    <img
+      src={`https://flagcdn.com/24x18/${code}.png`}
+      alt={pais}
+      width={18}
+      height={14}
+      style={{ borderRadius: 2, marginRight: 8, flexShrink: 0, verticalAlign: "middle" }}
+    />
+  );
+}
 
 function getCategoriaColor(score: number): string {
   if (score <= 40) return "#64748b";
@@ -124,15 +141,16 @@ export default function GrupoPage() {
               {grupo.scores.length > 0 && (
                 <div style={{ padding: "20px 24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
                   <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16 }}>
-                    RANKING DE FANATISMO — {grupo.scores.length} jugador{grupo.scores.length !== 1 ? "es" : ""}
+                    RANKING DE FANATISMO - {grupo.scores.length} jugador{grupo.scores.length !== 1 ? "es" : ""}
                   </div>
                   {grupo.scores.map((s: any, i: number) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < grupo.scores.length - 1 ? 10 : 0 }}>
                       <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: i === 0 ? "#f97316" : "#475569", width: 20, textAlign: "center", flexShrink: 0 }}>
                         {i === 0 ? "🥇" : `#${i + 1}`}
                       </div>
-                      <div style={{ flex: 1, fontFamily: "var(--font-body)", fontSize: 14, color: "#e2e8f0" }}>
-                        {s.pais && FLAGS[s.pais] ? `${FLAGS[s.pais]} ` : ""}{s.player_name}
+                      <div style={{ flex: 1, display: "flex", alignItems: "center", fontFamily: "var(--font-body)", fontSize: 14, color: "#e2e8f0" }}>
+                        <BanderaPais pais={s.pais} />
+                        {s.player_name}
                       </div>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4, width: 60, flexShrink: 0 }}>
                         <span style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: getCategoriaColor(s.score) }}>{s.score}</span>
@@ -174,9 +192,12 @@ export default function GrupoPage() {
                     marginBottom: 12,
                   }}
                 >
-                  <option value="">Tu país (opcional)</option>
-                  {PAISES.map((p) => <option key={p} value={p}>{p}</option>)}
+                  <option value="" style={{ color: "#111827" }}>Tu país (opcional)</option>
+                  {PAISES.map((p) => <option key={p} value={p} style={{ color: "#111827" }}>{p}</option>)}
                 </select>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#475569", marginBottom: 12, textAlign: "left" }}>
+                  Este ranking es visible para cualquiera que tenga este link, en cualquier momento.
+                </p>
                 <button
                   onClick={jugar}
                   disabled={!nombre.trim()}

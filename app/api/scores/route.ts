@@ -5,7 +5,7 @@
 //
 // País: se captura sin fricción de UI en el flujo solitario (sin grupo), vía el
 // header de geolocalización de Vercel (x-vercel-ip-country). No se usa para
-// mostrar un ranking público — solo para comparaciones futuras y contenido
+// mostrar un ranking público - solo para comparaciones futuras y contenido
 // (ver FANATICO-CONTENIDO-DRAFT.md sección 9).
 
 import { neon } from "@neondatabase/serverless";

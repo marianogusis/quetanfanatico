@@ -1,4 +1,4 @@
-# quetanfanatico.com — Decisiones técnicas y estado del proyecto
+# quetanfanatico.com - Decisiones técnicas y estado del proyecto
 
 Proyecto hermano de quetantermo.com.ar, pero **totalmente separado**: repo propio,
 deploy propio en Vercel, base de datos Neon propia. Nada se comparte entre ambos.
@@ -9,25 +9,25 @@ a Argentina, pensada para toda Latinoamérica, España y públicos hispanos en g
 
 - Next.js 16.2.9 con App Router
 - TypeScript
-- Vercel (Hobby plan) — deploy automático en git push
+- Vercel (Hobby plan) - deploy automático en git push
 - Neon serverless PostgreSQL (@neondatabase/serverless), instancia propia (no comparte con quetantermo)
-- Google Analytics 4 — **pendiente crear la property**; `layout.tsx` tiene el gaId hardcodeado como placeholder `G-XXXXXXXXXX`
+- Google Analytics 4 - **pendiente crear la property**; `layout.tsx` tiene el gaId hardcodeado como placeholder `G-XXXXXXXXXX`
 - @vercel/analytics activo
 
 ## Estructura de archivos relevantes
 
 ```
 app/
-  layout.tsx          — metadata, OG tags, GoogleAnalytics (gaId placeholder), Analytics
-  page.tsx            — TODO el juego: Landing, Juego, Resultado. Un solo archivo grande.
-  globals.css         — mínimo, casi sin uso
+  layout.tsx          - metadata, OG tags, GoogleAnalytics (gaId placeholder), Analytics
+  page.tsx            - TODO el juego: Landing, Juego, Resultado. Un solo archivo grande.
+  globals.css         - mínimo, casi sin uso
   api/
-    scores/route.ts   — POST: guarda score (+ país por geo-IP), devuelve percentil real
-    count/route.ts    — GET: COUNT(*) FROM scores, sin offset (proyecto nuevo)
-    grupos/route.ts   — POST: crea grupo (id = slug del nombre si lo pusieron, o random), guarda score del creador
-    grupos/[id]/route.ts — GET: leaderboard del grupo / POST: upsert score de jugador
+    scores/route.ts   - POST: guarda score (+ país por geo-IP), devuelve percentil real
+    count/route.ts    - GET: COUNT(*) FROM scores, sin offset (proyecto nuevo)
+    grupos/route.ts   - POST: crea grupo (id = slug del nombre si lo pusieron, o random), guarda score del creador
+    grupos/[id]/route.ts - GET: leaderboard del grupo / POST: upsert score de jugador
   grupo/
-    [id]/page.tsx     — Pantalla de entrada al grupo (self-contained, con sus propias fonts/CSS)
+    [id]/page.tsx     - Pantalla de entrada al grupo (self-contained, con sus propias fonts/CSS)
 ```
 
 ## Base de datos Neon
@@ -62,28 +62,28 @@ CREATE TABLE grupo_scores (
 );
 ```
 
-Variable de entorno en Vercel: `DATABASE_URL` (connection string de la instancia Neon de este proyecto — no reusar la de quetantermo).
+Variable de entorno en Vercel: `DATABASE_URL` (connection string de la instancia Neon de este proyecto - no reusar la de quetantermo).
 
 Diferencias de esquema vs. quetantermo:
 - `scores.pais` (VARCHAR 2): código de país ISO capturado por header `x-vercel-ip-country` (geo-IP de Vercel), sin fricción de UI. Puede ser NULL.
 - `grupos.id` pasó de `VARCHAR(10)` a `VARCHAR(50)`: ahora puede ser un slug de texto (ej. `familia`, `amigos-del-trabajo-2`) en vez de únicamente 8 caracteres random.
-- `grupos.nombre_grupo` y `grupo_scores.pais`/`grupos.pais`: soporte para nombrar el grupo al compartir y guardar país (nombre de país completo, no código, en el flujo de grupo — se pide junto al nombre del jugador).
+- `grupos.nombre_grupo` y `grupo_scores.pais`/`grupos.pais`: soporte para nombrar el grupo al compartir y guardar país (nombre de país completo, no código, en el flujo de grupo - se pide junto al nombre del jugador).
 
 ## Mecánica del juego
 
-- 30 preguntas de opción A/B (adaptadas de quetantermo: mismo formato y peso por dimensión, contenido de-argentinizado — ver historial de diseño para el detalle pregunta por pregunta)
+- 30 preguntas de opción A/B (adaptadas de quetantermo: mismo formato y peso por dimensión, contenido de-argentinizado - ver historial de diseño para el detalle pregunta por pregunta)
 - 8 dimensiones: Fanatismo, Pasión, Romanticismo, Resultadismo, Nostalgia, Modernidad, Racionalidad, AntiSistema
 - Fórmula de scoring: idéntica estructura a quetantermo (normalización 0-100 por dimensión, score ponderado, penalización por racionalidad/modernidad alta)
 - Perfil asignado por z-score vs. medias/desvíos calibrados por dimensión, con peso por perfil (`PERFIL_FIRMA`)
 - 10 perfiles: fanatico-nuclear, tribunero, anti-sistema, resultadista, nostalgico, moderno, analista, artista, fanatico-360, futbolero-de-bar
 - 5 categorías por score: Curioso (18-40), Simpatizante (41-56), Futbolero (57-68), Fanático (69-81), Fanático Total (82-96)
 
-## Calibración (ex ante, por simulación — sin datos reales todavía)
+## Calibración (ex ante, por simulación - sin datos reales todavía)
 
 A diferencia de quetantermo (calibrado con datos reales de ~103.000 jugadores),
 este proyecto se calibró **antes del lanzamiento** con una simulación Monte Carlo
 de 30.000 jugadores virtuales (`calibracion-fanatico.py`, en el repo de quetantermo
-— no se copió a este repo por ser una herramienta de diseño, no parte del producto).
+- no se copió a este repo por ser una herramienta de diseño, no parte del producto).
 Decisión explícita del usuario: **no se recalibra con datos reales después del
 lanzamiento**. Lo que salga, sale.
 
@@ -125,8 +125,8 @@ Distribución de perfiles esperada (simulada):
 - URL de juego con grupo: `/?grupo=<id>&jugador=<nombre>&pais=<pais>`
 - La pantalla de resultado detecta params y guarda el score en `grupo_scores` vía POST
 - Upsert: si el mismo `player_name` juega de nuevo en el mismo grupo, sobreescribe (queda el último resultado)
-- **ID de grupo**: si el creador puso nombre de referencia, el id es el slug de ese nombre (`familia`, `amigos-del-trabajo`); si ya existe, se le agrega un número (`familia-2`, `familia-3`...) en vez de agregar caracteres random. Sin nombre de referencia, id aleatorio de 8 caracteres (como en quetantermo). Trade-off aceptado: el id queda adivinable/enumerable — se acepta por ser de baja sensibilidad (ranking entre conocidos, no datos privados)
-- El usuario puede crear varios grupos independientes repitiendo la acción "Crear ranking" las veces que quiera (ej. uno para la familia, otro para el trabajo) — la UI lo aclara con un botón "+ Crear otro grupo" tras la primera creación
+- **ID de grupo**: si el creador puso nombre de referencia, el id es el slug de ese nombre (`familia`, `amigos-del-trabajo`); si ya existe, se le agrega un número (`familia-2`, `familia-3`...) en vez de agregar caracteres random. Sin nombre de referencia, id aleatorio de 8 caracteres (como en quetantermo). Trade-off aceptado: el id queda adivinable/enumerable - se acepta por ser de baja sensibilidad (ranking entre conocidos, no datos privados)
+- El usuario puede crear varios grupos independientes repitiendo la acción "Crear ranking" las veces que quiera (ej. uno para la familia, otro para el trabajo) - la UI lo aclara con un botón "+ Crear otro grupo" tras la primera creación
 - Leaderboard visible en pantalla de resultado y en `/grupo/[id]`, con bandera de país junto al nombre cuando está disponible
 
 ## Dato de país (sin ranking público)
