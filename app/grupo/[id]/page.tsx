@@ -109,7 +109,7 @@ export default function GrupoPage() {
             <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(36px, 10vw, 56px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.02em", background: "linear-gradient(135deg, #ffffff 0%, #f97316 50%, #ef4444 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 8 }}>
               ¿QUÉ TAN<br />FANÁTICO ERES?
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#cbd5e1", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               RANKING DE GRUPO
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function GrupoPage() {
               {/* Leaderboard actual */}
               {grupo.scores.length > 0 && (
                 <div style={{ padding: "20px 24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16 }}>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 16 }}>
                     RANKING DE FANATISMO - {grupo.scores.length} jugador{grupo.scores.length !== 1 ? "es" : ""}
                   </div>
                   {grupo.scores.map((s: any, i: number) => (
