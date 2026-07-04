@@ -76,14 +76,38 @@ export default function GrupoPage() {
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/grupos/${grupoId}`)
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) setNotFound(true);
-        else setGrupo(data);
+    let cancelado = false;
+    const espera = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Reintentamos antes de mostrar "grupo no encontrado": un hiccup transitorio
+    // de conexión con Neon (o abrir el link muy rápido después de crear el
+    // grupo) no debería mostrarse nunca como error al usuario que solo quiere
+    // ver el ranking.
+    const cargar = async () => {
+      for (let intento = 0; intento < 3; intento++) {
+        if (cancelado) return;
+        if (intento > 0) await espera(500);
+        try {
+          const r = await fetch(`/api/grupos/${grupoId}`);
+          const data = await r.json();
+          if (cancelado) return;
+          if (r.ok && !data.error) {
+            setGrupo(data);
+            setLoading(false);
+            return;
+          }
+        } catch {
+          // seguimos al próximo intento
+        }
+      }
+      if (!cancelado) {
+        setNotFound(true);
         setLoading(false);
-      })
-      .catch(() => { setNotFound(true); setLoading(false); });
+      }
+    };
+
+    cargar();
+    return () => { cancelado = true; };
   }, [grupoId]);
 
   const jugar = () => {
