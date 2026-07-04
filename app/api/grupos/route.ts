@@ -2,12 +2,14 @@
 // Input: POST { creator_name, score, categoria, perfil, nombre_grupo?, pais? }
 // Output: { grupo_id }
 //
-// A diferencia de quetantermo (id 100% aleatorio), si el creador puso un nombre
-// de referencia (ej. "Familia", "Amigos del trabajo"), el id del grupo es el
-// slug de ese nombre, y si ya existe se le agrega un número (familia-2, familia-3...)
-// en vez de caracteres random. Trade-off aceptado: el id queda adivinable/enumerable,
-// pero esto es de baja sensibilidad (un ranking de amigos, no datos privados).
-// Sin nombre de referencia, se usa el id aleatorio de 8 caracteres de siempre.
+// Si el creador puso un nombre de referencia (ej. "Familia", "Amigos del
+// trabajo"), el id del grupo es el slug de ese nombre, y si ya existe se le
+// agrega un número (familia-2, familia-3...) en vez de caracteres random.
+// Trade-off aceptado: el id queda adivinable/enumerable, pero esto es de baja
+// sensibilidad (un ranking de amigos, no datos privados).
+//
+// Sin nombre de referencia, se usa "grupo1", "grupo2", "grupo3"... (mismo
+// esquema de incremento, para no generar links feos tipo /grupo/x7k2m9qp).
 
 import { neon } from "@neondatabase/serverless";
 
@@ -24,34 +26,30 @@ function slugify(texto: string): string {
     .slice(0, 40);
 }
 
-function generarIdAleatorio(): string {
-  const chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-  return Array.from({ length: 8 }, () =>
-    chars[Math.floor(Math.random() * chars.length)]
-  ).join("");
-}
-
 export async function POST(request: Request) {
   try {
     const { creator_name, score, categoria, perfil, nombre_grupo, pais } = await request.json();
+
+    if (!creator_name || typeof score !== "number") {
+      return Response.json({ error: "Faltan datos obligatorios (creator_name, score)" }, { status: 400 });
+    }
+
     const sql = neon(process.env.DATABASE_URL!);
 
-    const base = nombre_grupo ? slugify(nombre_grupo) : "";
-    let grupo_id: string;
+    const slug = nombre_grupo ? slugify(nombre_grupo) : "";
+    const base = slug || "grupo";
+    let grupo_id = slug || "grupo1";
+    let n = slug ? 2 : 2;
+    let intentos = 0;
 
-    if (base) {
-      grupo_id = base;
-      let n = 2;
-      // Incrementa el sufijo numérico hasta encontrar un id libre.
-      // eslint-disable-next-line no-constant-condition
-      while (true) {
-        const [existing] = await sql`SELECT id FROM grupos WHERE id = ${grupo_id}`;
-        if (!existing) break;
-        grupo_id = `${base}-${n}`;
-        n++;
-      }
-    } else {
-      grupo_id = generarIdAleatorio();
+    // Incrementa el sufijo numérico hasta encontrar un id libre (con tope de
+    // seguridad para no loopear infinito ante un error de conexión repetido).
+    while (intentos < 500) {
+      const [existing] = await sql`SELECT id FROM grupos WHERE id = ${grupo_id}`;
+      if (!existing) break;
+      grupo_id = slug ? `${base}-${n}` : `grupo${n}`;
+      n++;
+      intentos++;
     }
 
     await sql`

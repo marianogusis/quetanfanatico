@@ -344,7 +344,7 @@ function Landing({ onStart }: any) {
             🔥 {totalJugadores.toLocaleString("es")} fanáticos ya lo jugaron
           </p>
         )}
-        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#475569", marginTop: 6 }}>⏱ Menos de 3 minutos · Gratis</p>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8", marginTop: 6 }}>⏱ Menos de 3 minutos · Gratis</p>
       </div>
     </div>
   );
@@ -392,7 +392,7 @@ function Juego({ onFinalizar }: any) {
         <div style={{ maxWidth: 440, width: "100%" }}>
 
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#475569", letterSpacing: "0.2em", textTransform: "uppercase" }}>ELIGE UNO</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#94a3b8", letterSpacing: "0.2em", textTransform: "uppercase" }}>ELIGE UNO</span>
           </div>
 
           <OpcionCard
@@ -417,7 +417,7 @@ function Juego({ onFinalizar }: any) {
             onClick={() => elegir("b")}
           />
 
-          <p style={{ textAlign: "center", marginTop: 20, fontFamily: "var(--font-body)", fontSize: 12, color: "#334155" }}>Toca para elegir · Sin vuelta atrás</p>
+          <p style={{ textAlign: "center", marginTop: 20, fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8" }}>Toca para elegir · Sin vuelta atrás</p>
         </div>
       </div>
     </div>
@@ -452,7 +452,7 @@ function OpcionCard({ texto, lado, seleccionado, rechazado, onClick }: any) {
         textAlign: "center",
         opacity: rechazado ? 0.35 : 1,
       }}>
-      <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: seleccionado ? "#f87171" : "#475569", letterSpacing: "0.2em", marginBottom: 8 }}>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: seleccionado ? "#f87171" : "#94a3b8", letterSpacing: "0.2em", marginBottom: 8 }}>
         OPCIÓN {lado}
       </div>
       <div style={{
@@ -561,10 +561,13 @@ function Resultado({ respuestas, onReiniciar }: any) {
   const [ultimoGrupoCreado, setUltimoGrupoCreado] = useState<string | null>(null);
   const [grupoCreado, setGrupoCreado] = useState(false);
 
+  const [errorGrupo, setErrorGrupo] = useState<string | null>(null);
+
   const crearGrupo = async () => {
     const nombre = nombreCreador.trim();
     if (!nombre) return;
     setCreandoGrupoLoading(true);
+    setErrorGrupo(null);
     try {
       const res = await fetch("/api/grupos", {
         method: "POST",
@@ -574,8 +577,13 @@ function Resultado({ respuestas, onReiniciar }: any) {
           nombre_grupo: nombreGrupo.trim() || null, pais: paisCreador || null,
         }),
       });
-      const { grupo_id } = await res.json();
-      const grupoUrl = `https://quetanfanatico.com/grupo/${grupo_id}`;
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.grupo_id) {
+        console.error("Error creando grupo:", data);
+        setErrorGrupo("No se pudo crear el grupo. Intenta de nuevo en un momento.");
+        return;
+      }
+      const grupoUrl = `https://quetanfanatico.com/grupo/${data.grupo_id}`;
       const nombreGrupoLimpio = nombreGrupo.trim();
       const nombreGrupoCap = nombreGrupoLimpio
         ? nombreGrupoLimpio.charAt(0).toUpperCase() + nombreGrupoLimpio.slice(1)
@@ -590,6 +598,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
       setNombreGrupo("");
     } catch (e) {
       console.error(e);
+      setErrorGrupo("No se pudo crear el grupo. Revisa tu conexión e intenta de nuevo.");
     } finally {
       setCreandoGrupoLoading(false);
     }
@@ -673,14 +682,14 @@ function Resultado({ respuestas, onReiniciar }: any) {
         <div style={{ textAlign: "center", marginBottom: 28, padding: "36px 24px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 300, height: 300, background: `radial-gradient(circle, ${categoria.color}20 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#64748b", letterSpacing: "0.15em", marginBottom: 16, textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#94a3b8", letterSpacing: "0.15em", marginBottom: 16, textTransform: "uppercase" }}>
             NIVEL DE FANATISMO
           </div>
 
           <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(72px, 22vw, 96px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
             {fanatismoScore}
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#475569", marginTop: 2, marginBottom: 16 }}>/100</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#94a3b8", marginTop: 2, marginBottom: 16 }}>/100</div>
 
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: categoria.color, letterSpacing: "0.04em", textTransform: "uppercase" }}>
             <span style={{ fontSize: 14, lineHeight: 1 }}>{categoria.emoji}</span>
@@ -695,7 +704,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
         </div>
 
         <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#475569", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>TU PERFIL</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>TU PERFIL</div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 900, color: "#f1f5f9", marginBottom: 6, letterSpacing: "-0.01em" }}>
             {perfil.emoji} {perfil.nombre}
           </div>
@@ -709,7 +718,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
         </div>
 
         <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#475569", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 18 }}>DESGLOSE DE PERSONALIDAD</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 18 }}>DESGLOSE DE PERSONALIDAD</div>
           {dimsParaMostrar.map(d => <DimBar key={d.label} {...d} />)}
         </div>
 
@@ -729,7 +738,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
           <div style={{ fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: "#f1f5f9", marginBottom: 8, letterSpacing: "-0.01em" }}>
             ¿TUS AMIGOS SON MÁS FANÁTICOS QUE TÚ?
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#64748b", marginBottom: 16 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", marginBottom: 16 }}>
             Crea un ranking grupal, mándales el link y que lo demuestren.
           </p>
           {grupoCreado ? (
@@ -790,12 +799,17 @@ function Resultado({ respuestas, onReiniciar }: any) {
                   fontFamily: "var(--font-body)", fontSize: 16, color: "#f1f5f9", marginBottom: 6,
                 }}
               />
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#64748b", marginBottom: 6, textAlign: "left" }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8", marginBottom: 6, textAlign: "left" }}>
                 Puedes crear más de un grupo - repite este paso las veces que quieras (familia, amigos, trabajo, etc.)
               </p>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#64748b", marginBottom: 10, textAlign: "left" }}>
-                Ojo: el link queda abierto - cualquiera que lo tenga puede entrar cuando quiera y ver el ranking completo de todos los que ya jugaron.
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8", marginBottom: 10, textAlign: "left" }}>
+                El link queda abierto - cualquiera que lo tenga puede entrar cuando quiera y ver el ranking completo de todos los que ya jugaron.
               </p>
+              {errorGrupo && (
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#f87171", marginBottom: 10, textAlign: "left" }}>
+                  {errorGrupo}
+                </p>
+              )}
               <button onClick={crearGrupo} disabled={!nombreCreador.trim() || creandoGrupoLoading} style={{
                 width: "100%", padding: "16px", borderRadius: 12, border: "none",
                 cursor: nombreCreador.trim() && !creandoGrupoLoading ? "pointer" : "not-allowed",
@@ -854,7 +868,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
               }}>
                 {descargando ? "⏳ Generando..." : "📸 Guardar imagen"}
               </button>
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#64748b", textAlign: "center", lineHeight: 1.4 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#94a3b8", textAlign: "center", lineHeight: 1.4 }}>
                 Guarda la imagen y compártela en Instagram, TikTok o Facebook Stories 📲
               </p>
               <button onClick={copiarLink} style={{
@@ -877,7 +891,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
               const esYo = s.player_name === jugadorNombre;
               return (
                 <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < grupoScores.length - 1 ? 10 : 0 }}>
-                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: i === 0 ? "#f97316" : "#475569", width: 24, textAlign: "center", flexShrink: 0 }}>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: i === 0 ? "#f97316" : "#94a3b8", width: 24, textAlign: "center", flexShrink: 0 }}>
                     {i === 0 ? "🥇" : `#${i + 1}`}
                   </div>
                   <div style={{ flex: 1, display: "flex", alignItems: "center", fontFamily: "var(--font-body)", fontSize: 14, color: esYo ? "#f97316" : "#e2e8f0", fontWeight: esYo ? 600 : 400 }}>
@@ -897,24 +911,32 @@ function Resultado({ respuestas, onReiniciar }: any) {
           </div>
         )}
 
-        <p style={{ textAlign: "center", marginTop: 14, fontFamily: "var(--font-body)", fontSize: 13, color: "#64748b", lineHeight: 1.4 }}>
+        <p style={{ textAlign: "center", marginTop: 14, fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", lineHeight: 1.4 }}>
           Puedes tocar todos los botones que quieras. ¡Compártelo donde quieras! 🚀
         </p>
 
-        <p style={{ textAlign: "center", marginTop: 24, fontFamily: "var(--font-mono)", fontSize: 11, color: "#475569", letterSpacing: "0.1em" }}>
+        <p style={{ textAlign: "center", marginTop: 24, fontFamily: "var(--font-mono)", fontSize: 11, color: "#94a3b8", letterSpacing: "0.1em" }}>
           ¿QUÉ TAN FANÁTICO ERES?
         </p>
 
         <div style={{ textAlign: "center", marginTop: 24, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#475569", marginBottom: 4 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", marginBottom: 4 }}>
             Hecho por Mariano Gusis
           </p>
           <a href="https://www.linkedin.com/in/mariano-gusis" target="_blank" rel="noopener noreferrer"
-            style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#475569", textDecoration: "none" }}
-            onMouseEnter={(e: any) => e.currentTarget.style.color = "#94a3b8"}
-            onMouseLeave={(e: any) => e.currentTarget.style.color = "#475569"}
+            style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}
+            onMouseEnter={(e: any) => e.currentTarget.style.color = "#e2e8f0"}
+            onMouseLeave={(e: any) => e.currentTarget.style.color = "#94a3b8"}
           >
-            linkedin.com/in/mariano-gusis
+            💼 linkedin.com/in/mariano-gusis
+          </a>
+          <br />
+          <a href="https://www.instagram.com/marianogusis/" target="_blank" rel="noopener noreferrer"
+            style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6, marginTop: 6 }}
+            onMouseEnter={(e: any) => e.currentTarget.style.color = "#e2e8f0"}
+            onMouseLeave={(e: any) => e.currentTarget.style.color = "#94a3b8"}
+          >
+            📷 instagram.com/marianogusis
           </a>
         </div>
       </div>

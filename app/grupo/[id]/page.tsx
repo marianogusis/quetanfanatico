@@ -109,13 +109,13 @@ export default function GrupoPage() {
             <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(36px, 10vw, 56px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.02em", background: "linear-gradient(135deg, #ffffff 0%, #f97316 50%, #ef4444 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 8 }}>
               ¿QUÉ TAN<br />FANÁTICO ERES?
             </div>
-            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#475569", letterSpacing: "0.1em", textTransform: "uppercase" }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#94a3b8", letterSpacing: "0.1em", textTransform: "uppercase" }}>
               RANKING DE GRUPO
             </div>
           </div>
 
           {loading && (
-            <p style={{ textAlign: "center", fontFamily: "var(--font-body)", color: "#475569" }}>Cargando...</p>
+            <p style={{ textAlign: "center", fontFamily: "var(--font-body)", color: "#94a3b8" }}>Cargando...</p>
           )}
 
           {notFound && (
@@ -132,7 +132,7 @@ export default function GrupoPage() {
                 <p style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.01em", marginBottom: 6 }}>
                   {grupo.creator_name} te desafió{grupo.nombre_grupo ? ` en "${grupo.nombre_grupo}"` : ""}
                 </p>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#64748b" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#94a3b8" }}>
                   ¿Quién es el más fanático del grupo?
                 </p>
               </div>
@@ -145,7 +145,7 @@ export default function GrupoPage() {
                   </div>
                   {grupo.scores.map((s: any, i: number) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: i < grupo.scores.length - 1 ? 10 : 0 }}>
-                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: i === 0 ? "#f97316" : "#475569", width: 20, textAlign: "center", flexShrink: 0 }}>
+                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: i === 0 ? "#f97316" : "#94a3b8", width: 20, textAlign: "center", flexShrink: 0 }}>
                         {i === 0 ? "🥇" : `#${i + 1}`}
                       </div>
                       <div style={{ flex: 1, display: "flex", alignItems: "center", fontFamily: "var(--font-body)", fontSize: 14, color: "#e2e8f0" }}>
@@ -195,7 +195,7 @@ export default function GrupoPage() {
                   <option value="" style={{ color: "#111827" }}>Tu país (opcional)</option>
                   {PAISES.map((p) => <option key={p} value={p} style={{ color: "#111827" }}>{p}</option>)}
                 </select>
-                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#475569", marginBottom: 12, textAlign: "left" }}>
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#94a3b8", marginBottom: 12, textAlign: "left" }}>
                   Este ranking es visible para cualquiera que tenga este link, en cualquier momento.
                 </p>
                 <button
