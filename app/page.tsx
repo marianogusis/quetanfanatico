@@ -560,6 +560,11 @@ function Resultado({ respuestas, onReiniciar }: any) {
   const [jugadorNombre, setJugadorNombre] = useState<string | null>(null);
   const [ultimoGrupoCreado, setUltimoGrupoCreado] = useState<string | null>(null);
   const [grupoCreado, setGrupoCreado] = useState(false);
+  // Al descargar la imagen para compartir, subimos el contraste de los labels
+  // chicos (mayúsculas, letras espaciadas) porque en la imagen rasterizada se
+  // ven más opacos que en pantalla - se comparte suelta, sin el resto de la web
+  // alrededor, así que necesita más contraste que la vista normal.
+  const [modoDescarga, setModoDescarga] = useState(false);
 
   const [errorGrupo, setErrorGrupo] = useState<string | null>(null);
 
@@ -635,12 +640,17 @@ function Resultado({ respuestas, onReiniciar }: any) {
     } catch { }
   };
 
+  const esperarFrame = () => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
   const descargarImagen = async () => {
     if (!cardRef.current) return;
     track("compartido", { canal: "guardar_imagen", perfil: perfil.id, score: fanatismoScore });
     sendGAEvent("event", "compartido", { canal: "guardar_imagen", perfil: perfil.id, score: fanatismoScore });
     setDescargando(true);
+    setModoDescarga(true);
     try {
+      // Esperamos a que React re-pinte con los colores de alto contraste antes de capturar.
+      await esperarFrame();
       const domtoimage = (await import("dom-to-image-more" as any)).default;
       const dataUrl = await domtoimage.toPng(cardRef.current, { quality: 1, scale: 2, bgcolor: "#090c10" });
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -658,6 +668,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
     } catch (e) {
       console.error("Error al generar imagen:", e);
     } finally {
+      setModoDescarga(false);
       setDescargando(false);
     }
   };
@@ -682,14 +693,14 @@ function Resultado({ respuestas, onReiniciar }: any) {
         <div style={{ textAlign: "center", marginBottom: 28, padding: "36px 24px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 300, height: 300, background: `radial-gradient(circle, ${categoria.color}20 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#cbd5e1", letterSpacing: "0.15em", marginBottom: 16, textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", marginBottom: 16, textTransform: "uppercase" }}>
             NIVEL DE FANATISMO
           </div>
 
           <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(72px, 22vw, 96px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
             {fanatismoScore}
           </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#cbd5e1", marginTop: 2, marginBottom: 16 }}>/100</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginTop: 2, marginBottom: 16 }}>/100</div>
 
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: categoria.color, letterSpacing: "0.04em", textTransform: "uppercase" }}>
             <span style={{ fontSize: 14, lineHeight: 1 }}>{categoria.emoji}</span>
@@ -704,7 +715,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
         </div>
 
         <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>TU PERFIL</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>TU PERFIL</div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 900, color: "#f1f5f9", marginBottom: 6, letterSpacing: "-0.01em" }}>
             {perfil.emoji} {perfil.nombre}
           </div>
@@ -718,7 +729,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
         </div>
 
         <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 18 }}>DESGLOSE DE PERSONALIDAD</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 18 }}>DESGLOSE DE PERSONALIDAD</div>
           {dimsParaMostrar.map(d => <DimBar key={d.label} {...d} />)}
         </div>
 
