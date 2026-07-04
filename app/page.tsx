@@ -68,7 +68,7 @@ const PERFILES = [
   {
     id: "anti-sistema", nombre: "EL ANTI-SISTEMA", emoji: "✊",
     descripcion: "El fútbol te lo arruinó el dinero, la FIFA, los dirigentes y el VAR.",
-    resumen: "El fútbol es corrupción, plata y robo. Pero igual vas a ver los 90 minutos.",
+    resumen: "El fútbol es corrupción, dinero y robo. Pero igual vas a ver los 90 minutos.",
   },
   {
     id: "analista", nombre: "EL ANALISTA", emoji: "📊",
@@ -82,7 +82,7 @@ const PERFILES = [
   },
   {
     id: "tribunero", nombre: "EL TRIBUNERO", emoji: "📣",
-    descripcion: "Lo tuyo es alentar con el cuerpo entero, cueste lo que cueste.",
+    descripcion: "Lo tuyo es alentar hasta el final, cueste lo que cueste.",
     resumen: "Para ti el fútbol es aliento. El resultado importa, pero alentar importa más.",
   },
   {
