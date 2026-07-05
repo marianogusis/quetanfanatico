@@ -39,6 +39,7 @@ CREATE TABLE scores (
   categoria VARCHAR(30) NOT NULL,
   perfil VARCHAR(50) NOT NULL,
   pais VARCHAR(2),
+  respuestas VARCHAR(30),
   created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -66,8 +67,16 @@ Variable de entorno en Vercel: `DATABASE_URL` (connection string de la instancia
 
 Diferencias de esquema vs. quetantermo:
 - `scores.pais` (VARCHAR 2): código de país ISO capturado por header `x-vercel-ip-country` (geo-IP de Vercel), sin fricción de UI. Puede ser NULL.
+- `scores.respuestas` (VARCHAR 30): una letra "a"/"b" por pregunta, en el orden fijo de `PREGUNTAS` (posición i = pregunta i+1). Permite queries analíticas del tipo "% de A vs B de la pregunta 2, por país" cruzando esta columna con `pais` en la misma tabla, sin joins. Ejemplo: `SELECT pais, substring(respuestas, 2, 1) AS q2, COUNT(*) FROM scores GROUP BY pais, q2;`. Costo de almacenamiento despreciable incluso a 1.000.000 de jugadores (~30 MB) - el análisis completo de esto está en el historial de diseño del proyecto. Puede ser NULL en filas donde el cliente no la mandó.
 - `grupos.id` pasó de `VARCHAR(10)` a `VARCHAR(50)`: ahora puede ser un slug de texto (ej. `familia`, `amigos-del-trabajo-2`) en vez de únicamente 8 caracteres random.
 - `grupos.nombre_grupo` y `grupo_scores.pais`/`grupos.pais`: soporte para nombrar el grupo al compartir y guardar país (nombre de país completo, no código, en el flujo de grupo - se pide junto al nombre del jugador).
+
+## Eventos de GA4 (además del `page_view` automático)
+
+- `quiz_iniciado`: al tocar "Empezar" en la landing.
+- `quiz_completado`: al llegar a la pantalla de resultado (perfil, score, categoría).
+- `compartido`: en cada acción de compartir (whatsapp, whatsapp_grupo, x, copiar_link, guardar_imagen), con el canal como parámetro.
+- `grupo_visto`: al cargar exitosamente `/grupo/[id]` (independientemente de si esa persona después juega o no). Sirve para distinguir en GA4 "entró a ver el ranking" de "terminó de jugar" (`quiz_completado`), sin depender solo del `page_view` automático por ruta.
 
 ## Mecánica del juego
 

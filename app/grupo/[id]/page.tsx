@@ -1,6 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { track } from "@vercel/analytics";
+import { sendGAEvent } from "@next/third-parties/google";
 
 const FONTS = `
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -94,6 +96,11 @@ export default function GrupoPage() {
           if (r.ok && !data.error) {
             setGrupo(data);
             setLoading(false);
+            // Evento explícito además del page_view automático: permite
+            // distinguir en GA4 "entró a ver el ranking" de "terminó de jugar"
+            // (quiz_completado), sin tener que inferirlo cruzando rutas.
+            track("grupo_visto", { grupo_id: grupoId });
+            sendGAEvent("event", "grupo_visto", { grupo_id: grupoId });
             return;
           }
         } catch {

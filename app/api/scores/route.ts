@@ -1,5 +1,5 @@
 // Guarda el score de un jugador y devuelve el percentil real.
-// Input: POST { score, categoria, perfil }
+// Input: POST { score, categoria, perfil, respuestas? }
 // Output: { percentil: number | null, total: number }
 // Si hay menos de 1000 registros, devuelve percentil: null (el frontend usa el simulado).
 //
@@ -7,12 +7,17 @@
 // header de geolocalización de Vercel (x-vercel-ip-country). No se usa para
 // mostrar un ranking público - solo para comparaciones futuras y contenido
 // (ver FANATICO-CONTENIDO-DRAFT.md sección 9).
+//
+// Respuestas: string de 30 caracteres ("a"/"b"), una por pregunta en orden fijo
+// (posición i = pregunta i+1). Permite queries tipo "% de A/B de la pregunta 2
+// por país" contra esta misma tabla, cruzando con la columna pais. Columna
+// opcional (puede venir null en filas viejas o si el cliente no la manda).
 
 import { neon } from "@neondatabase/serverless";
 
 export async function POST(request: Request) {
   try {
-    const { score, categoria, perfil } = await request.json();
+    const { score, categoria, perfil, respuestas } = await request.json();
 
     const sql = neon(process.env.DATABASE_URL!);
     const pais = request.headers.get("x-vercel-ip-country") || null;
@@ -27,8 +32,8 @@ export async function POST(request: Request) {
 
     // Guardar el score
     await sql`
-      INSERT INTO scores (score, categoria, perfil, pais)
-      VALUES (${score}, ${categoria}, ${perfil}, ${pais})
+      INSERT INTO scores (score, categoria, perfil, pais, respuestas)
+      VALUES (${score}, ${categoria}, ${perfil}, ${pais}, ${respuestas || null})
     `;
 
     const total = parseInt(existing.total);

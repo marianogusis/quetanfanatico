@@ -502,10 +502,16 @@ function Resultado({ respuestas, onReiniciar }: any) {
     track("quiz_completado", { perfil: perfil.id, score: fanatismoScore, categoria: categoria.label });
     sendGAEvent("event", "quiz_completado", { perfil: perfil.id, score: fanatismoScore, categoria: categoria.label });
 
+    // "respuestas" en Resultado ya viene en el orden fijo de PREGUNTAS (Juego
+    // recorre PREGUNTAS[0..29] secuencialmente, sin shuffle), así que la
+    // posición i de este string siempre corresponde a la pregunta i+1. Permite
+    // queries tipo "% de A/B de la pregunta 2 por país" contra la tabla scores.
+    const respuestasCompactas = respuestas.map((r: any) => r.opcion).join("");
+
     fetch("/api/scores", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ score: fanatismoScore, categoria: categoria.label, perfil: perfil.id }),
+      body: JSON.stringify({ score: fanatismoScore, categoria: categoria.label, perfil: perfil.id, respuestas: respuestasCompactas }),
     })
       .then((r) => r.json())
       .then((data) => {
