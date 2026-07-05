@@ -156,7 +156,9 @@ Distribución de perfiles esperada (simulada):
 
 ## Ranking de países
 
-- Página pública `/paises`, enlazada solo desde la pantalla de resultado (sin link en nav ni landing) - se descubre naturalmente después de jugar, sin necesidad de bloquearla técnicamente. Sin login en el proyecto, cualquier restricción real sería floja y fácil de esquivar; mismo criterio ya usado en el ranking de grupo (el link queda abierto para quien lo tenga).
+- Se muestra en un **modal** dentro de la pantalla de resultado (no navega a otra página), para no sacar a la persona de ahí - es donde está el botón real de difusión (crear grupo). Cerrar el modal ("✕" o "← Volver a tu resultado") la devuelve exactamente a su resultado, sin perder nada.
+- Existe también como página standalone en `/paises` (mismo fetch a `/api/paises`, capa de UI duplicada) por si sirve a futuro para linkear directo o compartir como contenido - hoy no está enlazada desde ningún lado de la UI, es el modal el punto de entrada real.
+- Sin link en nav ni landing en ningún caso - se descubre naturalmente después de jugar, sin necesidad de bloquearla técnicamente. Sin login en el proyecto, cualquier restricción real sería floja y fácil de esquivar; mismo criterio ya usado en el ranking de grupo (el link queda abierto para quien lo tenga).
 - `/api/paises` (GET): `SELECT pais, AVG(score), COUNT(*) FROM scores GROUP BY pais HAVING COUNT(*) >= 100 ORDER BY AVG(score) DESC`. Piso de 100 jugadores por país para que el promedio sea estadísticamente razonable (evita que un país con 2 jugadores lidere la tabla) y como incentivo a compartir para que el propio país aparezca.
 - Fila de total: promedio y cantidad sobre **todos** los jugadores que completaron el quiz, de cualquier país (no el promedio de los promedios por país, y sin aplicar el piso de 100 - es el número global real).
 - Nombre del país a partir del código ISO vía `Intl.DisplayNames(['es'], {type:'region'})` en vez de una tabla hardcodeada (a diferencia de `/grupo`, acá pueden aparecer países de cualquier parte del mundo, no solo los ~21 de la lista de Latinoamérica/España/EEUU).
