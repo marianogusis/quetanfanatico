@@ -75,8 +75,14 @@ Diferencias de esquema vs. quetantermo:
 
 - `quiz_iniciado`: al tocar "Empezar" en la landing.
 - `quiz_completado`: al llegar a la pantalla de resultado (perfil, score, categoría).
-- `compartido`: en cada acción de compartir (whatsapp, whatsapp_grupo, x, copiar_link, guardar_imagen), con el canal como parámetro.
+- `compartido`: en cada acción de compartir (whatsapp, whatsapp_grupo, x, copiar_link, guardar_imagen, compartir_nativo), con el canal como parámetro.
 - `grupo_visto`: al cargar exitosamente `/grupo/[id]` (independientemente de si esa persona después juega o no). Sirve para distinguir en GA4 "entró a ver el ranking" de "terminó de jugar" (`quiz_completado`), sin depender solo del `page_view` automático por ruta.
+
+## Compartir con imagen (share nativo)
+
+- X (`twitter.com/intent/tweet`) no permite adjuntar imagen vía URL en ninguna plataforma - límite de X, no del código. Se mantiene texto + link ahí.
+- Detección por capacidad (`navigator.canShare({ files })`), no por user-agent: en navegadores que lo soportan (Android Chrome, iOS Safari 16.4+), el botón "Compartir" genera la imagen del resultado (misma captura que "Guardar imagen") y abre el share nativo del sistema con el archivo adjunto - ahí el usuario elige X, Instagram, WhatsApp, etc.
+- Donde no hay soporte (desktop, navegadores viejos): se mantiene el flujo anterior, botón de X (solo texto) + botón separado de "Guardar imagen".
 
 ## Mecánica del juego
 

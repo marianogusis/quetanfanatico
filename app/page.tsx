@@ -574,7 +574,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
   };
 
   const SITE_URL = "https://quetanfanatico.com";
-  const textoCompartir = `Saqué ${fanatismoScore}/100 en "¿Qué tan fanático eres?" 🔥\nPerfil: ${perfil.nombre}\n\n¿Tú qué tan fanático eres? 🔥`;
+  const textoCompartir = `Saqué ${fanatismoScore}/100 en "¿Qué tan fanático eres?" 🔥\nPerfil: ${perfil.nombre}\n\n¿Tú qué tan fanático eres? 🔥\n¡Juégalo y desafía a tu grupo!`;
   const textoConLink = `${textoCompartir}\n${SITE_URL}`;
   const [descargando, setDescargando] = useState(false);
   const [creandoGrupo, setCreandoGrupo] = useState(false);
@@ -594,6 +594,26 @@ function Resultado({ respuestas, onReiniciar }: any) {
   const [modoDescarga, setModoDescarga] = useState(false);
 
   const [errorGrupo, setErrorGrupo] = useState<string | null>(null);
+
+  // Detección por capacidad, no por user-agent: Android Chrome y iOS Safari
+  // 16.4+ soportan compartir un archivo vía el share nativo del sistema
+  // (navigator.share con "files"), lo que deja al usuario elegir X, Instagram,
+  // WhatsApp, etc. con la imagen ya adjunta. Desktop y navegadores viejos no,
+  // y en esos casos se mantiene el flujo anterior (botón de X solo texto +
+  // botón de descargar imagen aparte).
+  const [puedeCompartirImagen, setPuedeCompartirImagen] = useState(false);
+  useEffect(() => {
+    try {
+      const archivoPrueba = new File([""], "test.png", { type: "image/png" });
+      setPuedeCompartirImagen(
+        typeof navigator !== "undefined" &&
+        typeof (navigator as any).canShare === "function" &&
+        (navigator as any).canShare({ files: [archivoPrueba] })
+      );
+    } catch {
+      setPuedeCompartirImagen(false);
+    }
+  }, []);
 
   const espera = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -730,6 +750,32 @@ function Resultado({ respuestas, onReiniciar }: any) {
     }
   };
 
+  const compartirConImagen = async () => {
+    if (!cardRef.current) return;
+    track("compartido", { canal: "compartir_nativo", perfil: perfil.id, score: fanatismoScore });
+    sendGAEvent("event", "compartido", { canal: "compartir_nativo", perfil: perfil.id, score: fanatismoScore });
+    setDescargando(true);
+    setModoDescarga(true);
+    try {
+      await esperarFrame();
+      const domtoimage = (await import("dom-to-image-more" as any)).default;
+      const dataUrl = await domtoimage.toPng(cardRef.current, { quality: 1, scale: 2, bgcolor: "#090c10" });
+      const blob = await (await fetch(dataUrl)).blob();
+      const archivo = new File([blob], "que-tan-fanatico-eres.png", { type: "image/png" });
+      if ((navigator as any).canShare && (navigator as any).canShare({ files: [archivo] })) {
+        await navigator.share({ files: [archivo], text: textoCompartir } as any);
+      } else {
+        // Fallback por si cambió de idea el navegador entre el chequeo inicial y el click.
+        await descargarImagen();
+      }
+    } catch (e: any) {
+      if (e?.name !== "AbortError") console.error("Error al compartir imagen:", e);
+    } finally {
+      setModoDescarga(false);
+      setDescargando(false);
+    }
+  };
+
   const compartir = async () => {
     try {
       if (navigator.share) {
@@ -755,7 +801,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
           </div>
 
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 3 }}>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(56px, 16vw, 76px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: 68, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
               {fanatismoScore}
             </span>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginBottom: 8 }}>/100</span>
@@ -893,18 +939,14 @@ function Resultado({ respuestas, onReiniciar }: any) {
           )}
         </div>
 
-        {/iPhone|iPad|iPod/i.test(typeof navigator !== "undefined" ? navigator.userAgent : "") ? (
+        {puedeCompartirImagen ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 10 }}>
-            <div style={{ padding: "16px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)",
-              background: "rgba(255,255,255,0.05)", fontFamily: "var(--font-body)", fontSize: 13, color: "#e2e8f0", textAlign: "center", lineHeight: 1.6 }}>
-              📸 Haz screenshot arriba para guardar la imagen y compártela en Instagram, TikTok o Facebook Stories 📲
-            </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <button onClick={compartirX} style={{
+              <button onClick={compartirConImagen} disabled={descargando} style={{
                 padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer",
                 background: "rgba(255,255,255,0.05)", fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "#e2e8f0",
               }}>
-                𝕏  Compartir
+                {descargando ? "⏳ Generando..." : "📤 Compartir"}
               </button>
               <button onClick={onReiniciar} style={{
                 padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.1)", cursor: "pointer",
@@ -913,6 +955,9 @@ function Resultado({ respuestas, onReiniciar }: any) {
                 🔄 Jugar de nuevo
               </button>
             </div>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#94a3b8", textAlign: "center", lineHeight: 1.4 }}>
+              Se genera la imagen y elegís dónde mandarla: X, Instagram, WhatsApp, donde quieras
+            </p>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 10 }}>
@@ -921,7 +966,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
                 padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.15)", cursor: "pointer",
                 background: "rgba(255,255,255,0.05)", fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "#e2e8f0",
               }}>
-                𝕏  Compartir
+                𝕏  Compartir resultado
               </button>
               <div style={{ flex: 1 }} />
               <button onClick={onReiniciar} style={{
