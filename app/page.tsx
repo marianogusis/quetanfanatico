@@ -893,15 +893,9 @@ function Resultado({ respuestas, onReiniciar }: any) {
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginLeft: 10, verticalAlign: "baseline" }}>/100</span>
           </div>
 
-          {/* Sin inline-flex acá a propósito, mismo motivo que el puntaje/100:
-              dom-to-image-more no centra bien elementos flex al descargar la
-              imagen (se veía descentrado solo en la descarga, no en pantalla).
-              Con inline-block + text-align:center del padre, es estable. */}
-          <div style={{ textAlign: "center", marginTop: 6 }}>
-            <span style={{ display: "inline-block", padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 800, color: categoria.color, letterSpacing: "0.03em", textTransform: "uppercase" }}>
-              <span style={{ fontSize: 13, lineHeight: 1, marginRight: 6 }}>{categoria.emoji}</span>
-              <span>{categoria.label}</span>
-            </span>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 6, padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 800, color: categoria.color, letterSpacing: "0.03em", textTransform: "uppercase" }}>
+            <span style={{ fontSize: 13, lineHeight: 1 }}>{categoria.emoji}</span>
+            <span>{categoria.label}</span>
           </div>
 
           <div style={{ marginTop: 6, padding: "7px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", display: "inline-block" }}>
