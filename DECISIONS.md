@@ -80,6 +80,14 @@ Diferencias de esquema vs. quetantermo:
 - `quiz_completado`: al llegar a la pantalla de resultado (perfil, score, categoría).
 - `compartido`: en cada acción de compartir (whatsapp, whatsapp_grupo, x, copiar_link, guardar_imagen, compartir_nativo), con el canal como parámetro.
 - `grupo_visto`: al cargar exitosamente `/grupo/[id]` (independientemente de si esa persona después juega o no). Sirve para distinguir en GA4 "entró a ver el ranking" de "terminó de jugar" (`quiz_completado`), sin depender solo del `page_view` automático por ruta.
+- `click_apoyo`: al tocar el botón "☕ ¿Me invitas un cafecito?" en la pantalla de resultado (canal: patreon).
+
+## Apoyo económico (Patreon)
+
+- Botón "☕ ¿Me invitas un cafecito?" en la pantalla de resultado, debajo del botón de ranking de países. Linkea a `https://www.patreon.com/cw/quetanfanatico/shop`, la tienda del creador con 4 "productos" de precio fijo usados como tip jar (Patreon no tiene campo de monto libre como Cafecito): Cafecito ($3), Cafecito doble ($5), Eres un crack ($10), Fanático total ($20). No entregan contenido real, son solo la excusa para poner un precio.
+- Se eligió Patreon en vez de Cafecito o Buy Me a Coffee porque: Buy Me a Coffee no permite cobrar desde Argentina (Stripe Standard Connect, sin soporte de Payoneer/Wise, Argentina no está en su lista de países); Cafecito es una marca poco reconocida fuera de Argentina, y este proyecto apunta a toda Latinoamérica y España. Patreon sí soporta pagouts a Argentina (bank transfer procesado por Payoneer, en ARS) y es una marca más reconocida internacionalmente.
+- Cobro configurado: transferencia bancaria directa a banco argentino (procesada por Payoneer como partner bancario, no hace falta cuenta de Payoneer activa), fee $0.25 + 1.55% por retiro. Formulario de impuestos de no residente en EEUU (W-8BEN) completado.
+- Los que pagan usan tarjeta o PayPal (Apple Pay/Venmo son solo EEUU, no relevantes para esta audiencia).
 
 ## Compartir con imagen (share nativo)
 

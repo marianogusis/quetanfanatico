@@ -1126,6 +1126,26 @@ function Resultado({ respuestas, onReiniciar }: any) {
           </button>
         </div>
 
+        <div style={{ textAlign: "center", marginTop: 12 }}>
+          <a
+            href="https://www.patreon.com/cw/quetanfanatico/shop"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => {
+              track("compartido", { canal: "patreon", perfil: perfil.id, score: fanatismoScore });
+              sendGAEvent("event", "click_apoyo", { canal: "patreon" });
+            }}
+            style={{
+              display: "inline-block", padding: "14px 24px", borderRadius: 12,
+              border: "1px solid rgba(249,115,22,0.3)", background: "rgba(249,115,22,0.08)",
+              fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "#fdba74",
+              textDecoration: "none",
+            }}
+          >
+            ☕ ¿Me invitas un cafecito?
+          </a>
+        </div>
+
         {mostrarPaises && typeof document !== "undefined" && createPortal(
           <div
             onClick={() => setMostrarPaises(false)}
