@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useMemo } from "react";
+import Link from "next/link";
 import { track } from "@vercel/analytics";
 import { sendGAEvent } from "@next/third-parties/google";
 
@@ -1048,9 +1049,16 @@ function Resultado({ respuestas, onReiniciar }: any) {
           Puedes tocar todos los botones que quieras. ¡Compártelo donde quieras! 🚀
         </p>
 
-        <p style={{ textAlign: "center", marginTop: 24, fontFamily: "var(--font-mono)", fontSize: 11, color: "#cbd5e1", letterSpacing: "0.1em" }}>
-          ¿QUÉ TAN FANÁTICO ERES?
-        </p>
+        <div style={{ textAlign: "center", marginTop: 24 }}>
+          <Link href="/paises" style={{
+            display: "inline-block", padding: "14px 24px", borderRadius: 12,
+            border: "1px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.04)",
+            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "#e2e8f0",
+            textDecoration: "none",
+          }}>
+            🌎 Mira el ranking de fanatismo por país
+          </Link>
+        </div>
 
         <div style={{ textAlign: "center", marginTop: 24, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
           <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", marginBottom: 8 }}>

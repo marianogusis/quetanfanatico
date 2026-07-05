@@ -26,8 +26,11 @@ app/
     count/route.ts    - GET: COUNT(*) FROM scores, sin offset (proyecto nuevo)
     grupos/route.ts   - POST: crea grupo (id = slug del nombre si lo pusieron, o random), guarda score del creador
     grupos/[id]/route.ts - GET: leaderboard del grupo / POST: upsert score de jugador
+    paises/route.ts   - GET: fanatismo promedio por país (ver sección "Ranking de países")
   grupo/
     [id]/page.tsx     - Pantalla de entrada al grupo (self-contained, con sus propias fonts/CSS)
+  paises/
+    page.tsx          - Ranking de fanatismo por país (self-contained, con sus propias fonts/CSS)
 ```
 
 ## Base de datos Neon
@@ -145,11 +148,19 @@ Distribución de perfiles esperada (simulada):
 - El usuario puede crear varios grupos independientes repitiendo la acción "Crear ranking" las veces que quiera (ej. uno para la familia, otro para el trabajo) - la UI lo aclara con un botón "+ Crear otro grupo" tras la primera creación
 - Leaderboard visible en pantalla de resultado y en `/grupo/[id]`, con bandera de país junto al nombre cuando está disponible
 
-## Dato de país (sin ranking público)
+## Dato de país
 
-- Flujo solitario (sin grupo): se captura sin fricción de UI vía geo-IP (header `x-vercel-ip-country` de Vercel) al guardar en `/api/scores`
-- Flujo de grupo: se pregunta junto al nombre (ya hay un campo de texto en pantalla, no agrega fricción extra)
-- **No hay ranking público por país.** El dato se guarda para (1) mostrar la bandera junto al nombre en el ranking de grupo, y (2) generar contenido futuro (comparaciones entre países, posts tipo "distribución real de perfiles" como los que se hacían para quetantermo)
+- Flujo solitario (sin grupo): se captura sin fricción de UI vía geo-IP (header `x-vercel-ip-country` de Vercel) al guardar en `/api/scores`. Se guarda como código ISO de 2 letras (columna `scores.pais`), no nombre completo.
+- Flujo de grupo: se pregunta junto al nombre (ya hay un campo de texto en pantalla, no agrega fricción extra). Ahí se guarda el nombre completo del país (columnas `grupos.pais` / `grupo_scores.pais`), no el código ISO - son dos formatos de país distintos en la base, cada uno para su flujo.
+- El dato sirve para (1) mostrar la bandera junto al nombre en el ranking de grupo, (2) el ranking de países agregado (ver abajo), y (3) contenido futuro (posts tipo "distribución real de perfiles" como los que se hacían para quetantermo)
+
+## Ranking de países
+
+- Página pública `/paises`, enlazada solo desde la pantalla de resultado (sin link en nav ni landing) - se descubre naturalmente después de jugar, sin necesidad de bloquearla técnicamente. Sin login en el proyecto, cualquier restricción real sería floja y fácil de esquivar; mismo criterio ya usado en el ranking de grupo (el link queda abierto para quien lo tenga).
+- `/api/paises` (GET): `SELECT pais, AVG(score), COUNT(*) FROM scores GROUP BY pais HAVING COUNT(*) >= 100 ORDER BY AVG(score) DESC`. Piso de 100 jugadores por país para que el promedio sea estadísticamente razonable (evita que un país con 2 jugadores lidere la tabla) y como incentivo a compartir para que el propio país aparezca.
+- Fila de total: promedio y cantidad sobre **todos** los jugadores que completaron el quiz, de cualquier país (no el promedio de los promedios por país, y sin aplicar el piso de 100 - es el número global real).
+- Nombre del país a partir del código ISO vía `Intl.DisplayNames(['es'], {type:'region'})` en vez de una tabla hardcodeada (a diferencia de `/grupo`, acá pueden aparecer países de cualquier parte del mundo, no solo los ~21 de la lista de Latinoamérica/España/EEUU).
+- Cacheado 5 minutos en el edge (`revalidate = 300`), mismo criterio que `/api/count`, para no martillar Neon.
 
 ## Decisiones de arquitectura relevantes
 
