@@ -740,8 +740,8 @@ function Resultado({ respuestas, onReiniciar }: any) {
       const nombreGrupoCap = nombreGrupoLimpio
         ? nombreGrupoLimpio.charAt(0).toUpperCase() + nombreGrupoLimpio.slice(1)
         : "";
-      const referenciaRanking = nombreGrupoCap ? `el ranking de "${nombreGrupoCap}"` : "el ranking del grupo";
-      const texto = `Saqué ${fanatismoScore}/100 en "¿Qué tan fanático eres?" 🔥\nPerfil: ${perfil.nombre}\n\n¿Puedes superarme? Entra a ${referenciaRanking}:\n${grupoUrl}\n\nEl link queda abierto - cualquiera que lo tenga puede entrar cuando quiera y ver el ranking completo de todos los que ya jugaron.`;
+      const referenciaRanking = nombreGrupoCap ? `al ranking de "${nombreGrupoCap}"` : "al ranking del grupo";
+      const texto = `Saqué ${fanatismoScore}/100 en "¿Qué tan fanático eres?" 🔥\nPerfil: ${perfil.nombre}\n\n¿Y tú qué tan fanático eres? Entra ${referenciaRanking}:\n${grupoUrl}\n\nEl link queda abierto - cualquiera que lo tenga puede entrar cuando quiera y ver el ranking completo de todos los que ya jugaron.`;
       track("compartido", { canal: "whatsapp_grupo", perfil: perfil.id, score: fanatismoScore });
       sendGAEvent("event", "compartido", { canal: "whatsapp_grupo", perfil: perfil.id, score: fanatismoScore });
       window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, "_blank");
@@ -893,9 +893,15 @@ function Resultado({ respuestas, onReiniciar }: any) {
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginLeft: 10, verticalAlign: "baseline" }}>/100</span>
           </div>
 
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 6, padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 800, color: categoria.color, letterSpacing: "0.03em", textTransform: "uppercase" }}>
-            <span style={{ fontSize: 13, lineHeight: 1 }}>{categoria.emoji}</span>
-            <span>{categoria.label}</span>
+          {/* Sin inline-flex acá a propósito, mismo motivo que el puntaje/100:
+              dom-to-image-more no centra bien elementos flex al descargar la
+              imagen (se veía descentrado solo en la descarga, no en pantalla).
+              Con inline-block + text-align:center del padre, es estable. */}
+          <div style={{ textAlign: "center", marginTop: 6 }}>
+            <span style={{ display: "inline-block", padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 800, color: categoria.color, letterSpacing: "0.03em", textTransform: "uppercase" }}>
+              <span style={{ fontSize: 13, lineHeight: 1, marginRight: 6 }}>{categoria.emoji}</span>
+              <span>{categoria.label}</span>
+            </span>
           </div>
 
           <div style={{ marginTop: 6, padding: "7px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", display: "inline-block" }}>
@@ -1142,7 +1148,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
               textDecoration: "none",
             }}
           >
-            ☕ ¿Me invitas un cafecito?
+            ❤️ ¿Quieres apoyar al proyecto?
           </a>
         </div>
 
