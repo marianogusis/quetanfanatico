@@ -83,7 +83,7 @@ const PERFILES = [
   {
     id: "tribunero", nombre: "EL TRIBUNERO", emoji: "📣",
     descripcion: "Lo tuyo es alentar hasta el final, cueste lo que cueste.",
-    resumen: "Para ti el fútbol es aliento. El resultado importa, pero alentar importa más.",
+    resumen: "Para ti el fútbol se juega también desde la tribuna. El resultado importa, pero acompañar importa más.",
   },
   {
     id: "fanatico-360", nombre: "EL FANÁTICO 360", emoji: "🔥",
@@ -258,12 +258,12 @@ const ProgressBar = ({ current, total }: any) => {
 };
 
 const DimBar = ({ label, value, color }: any) => (
-  <div style={{ marginBottom: 14 }}>
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 5, fontSize: 12, color: "#e2e8f0", fontFamily: "var(--font-mono)" }}>
+  <div style={{ marginBottom: 9 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 3, fontSize: 12, color: "#e2e8f0", fontFamily: "var(--font-mono)" }}>
       <span style={{ textTransform: "uppercase", letterSpacing: "0.08em" }}>{label}</span>
       <span style={{ color: "#e2e8f0" }}>{value}%</span>
     </div>
-    <div style={{ height: 6, background: "rgba(255,255,255,0.07)", borderRadius: 99, overflow: "hidden" }}>
+    <div style={{ height: 5, background: "rgba(255,255,255,0.07)", borderRadius: 99, overflow: "hidden" }}>
       <div style={{ height: "100%", width: `${value}%`, background: color, borderRadius: 99, transition: "width 1s ease" }} />
     </div>
   </div>
@@ -747,46 +747,50 @@ function Resultado({ respuestas, onReiniciar }: any) {
       <div style={{ maxWidth: 440, width: "100%", transition: "opacity 0.6s ease, transform 0.6s ease", opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)" }}>
 
         <div ref={cardRef} style={{ background: "#090c10", padding: "4px 0 4px", borderRadius: 20, overflow: "hidden" }}>
-        <div style={{ textAlign: "center", marginBottom: 28, padding: "36px 24px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, position: "relative", overflow: "hidden" }}>
+        <div style={{ textAlign: "center", marginBottom: 18, padding: "22px 20px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%,-50%)", width: 300, height: 300, background: `radial-gradient(circle, ${categoria.color}20 0%, transparent 70%)`, pointerEvents: "none" }} />
 
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", marginBottom: 16, textTransform: "uppercase" }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", marginBottom: 8, textTransform: "uppercase" }}>
             NIVEL DE FANATISMO
           </div>
 
-          <div style={{ fontFamily: "var(--font-display)", fontSize: "clamp(72px, 22vw, 96px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-            {fanatismoScore}
-          </div>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginTop: 2, marginBottom: 16 }}>/100</div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 14, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 3 }}>
+              <span style={{ fontFamily: "var(--font-display)", fontSize: "clamp(56px, 16vw, 76px)", fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                {fanatismoScore}
+              </span>
+              <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginBottom: 8 }}>/100</span>
+            </div>
 
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 20px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: categoria.color, letterSpacing: "0.04em", textTransform: "uppercase" }}>
-            <span style={{ fontSize: 14, lineHeight: 1 }}>{categoria.emoji}</span>
-            <span>{categoria.label}</span>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 99, fontFamily: "var(--font-display)", fontSize: 16, fontWeight: 800, color: categoria.color, letterSpacing: "0.03em", textTransform: "uppercase" }}>
+              <span style={{ fontSize: 13, lineHeight: 1 }}>{categoria.emoji}</span>
+              <span>{categoria.label}</span>
+            </div>
           </div>
 
-          <div style={{ marginTop: 14, padding: "8px 20px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", display: "inline-block" }}>
-            <span style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#cbd5e1" }}>
+          <div style={{ marginTop: 10, padding: "7px 18px", borderRadius: 10, background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.09)", display: "inline-block" }}>
+            <span style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#cbd5e1" }}>
               {percentilData.emoji} {percentilData.texto}
             </span>
           </div>
         </div>
 
-        <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 10 }}>TU PERFIL</div>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 900, color: "#f1f5f9", marginBottom: 6, letterSpacing: "-0.01em" }}>
+        <div style={{ padding: "18px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 14 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 8 }}>TU PERFIL</div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 24, fontWeight: 900, color: "#f1f5f9", marginBottom: 4, letterSpacing: "-0.01em" }}>
             {perfil.emoji} {perfil.nombre}
           </div>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#94a3b8", lineHeight: 1.5, margin: 0 }}>{perfil.descripcion}</p>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 14, color: "#94a3b8", lineHeight: 1.4, margin: 0 }}>{perfil.descripcion}</p>
 
-          <div style={{ marginTop: 16, padding: "14px", background: "rgba(255,255,255,0.03)", borderRadius: 12, borderLeft: "3px solid #f97316" }}>
-            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#cbd5e1", lineHeight: 1.5, margin: 0, fontStyle: "italic" }}>
+          <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(255,255,255,0.03)", borderRadius: 12, borderLeft: "3px solid #f97316" }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#cbd5e1", lineHeight: 1.4, margin: 0, fontStyle: "italic" }}>
               "{perfil.resumen}"
             </p>
           </div>
         </div>
 
-        <div style={{ padding: "24px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 20 }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 18 }}>DESGLOSE DE PERSONALIDAD</div>
+        <div style={{ padding: "18px", background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 20, marginBottom: 0 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", letterSpacing: "0.15em", textTransform: "uppercase", marginBottom: 12 }}>TU ADN FUTBOLERO</div>
           {dimsParaMostrar.map(d => <DimBar key={d.label} {...d} />)}
         </div>
 
