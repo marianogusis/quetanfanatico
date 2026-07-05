@@ -807,7 +807,14 @@ function Resultado({ respuestas, onReiniciar }: any) {
           </div>
 
           <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 3 }}>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: 68, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            <span style={
+              modoDescarga
+                // El truco de degradado con background-clip:text lo corta mal
+                // dom-to-image-more al rasterizar (se ve bien en pantalla, mal
+                // en la imagen descargada). Al descargar usamos color sólido.
+                ? { fontFamily: "var(--font-display)", fontSize: 68, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", color: categoria.color }
+                : { fontFamily: "var(--font-display)", fontSize: 68, fontWeight: 900, lineHeight: 1, letterSpacing: "-0.04em", background: `linear-gradient(135deg, #fff 0%, ${categoria.color} 100%)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }
+            }>
               {fanatismoScore}
             </span>
             <span style={{ fontFamily: "var(--font-mono)", fontSize: 13, color: modoDescarga ? "#f1f5f9" : "#cbd5e1", marginBottom: 8 }}>/100</span>
