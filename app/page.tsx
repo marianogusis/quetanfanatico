@@ -595,14 +595,17 @@ function Resultado({ respuestas, onReiniciar }: any) {
 
   const [errorGrupo, setErrorGrupo] = useState<string | null>(null);
 
-  // Detección por capacidad, no por user-agent: Android Chrome y iOS Safari
-  // 16.4+ soportan compartir un archivo vía el share nativo del sistema
-  // (navigator.share con "files"), lo que deja al usuario elegir X, Instagram,
-  // WhatsApp, etc. con la imagen ya adjunta. Desktop y navegadores viejos no,
-  // y en esos casos se mantiene el flujo anterior (botón de X solo texto +
-  // botón de descargar imagen aparte).
+  // El botón único "Compartir" (con imagen adjunta vía share nativo) es solo
+  // para celular. Windows (Chrome/Edge) también soporta navigator.canShare
+  // con archivos porque Windows tiene su propio panel de share nativo, así
+  // que la detección por capacidad sola no alcanza: hay que combinarla con
+  // un chequeo de que sea un teléfono. En desktop (aunque el navegador
+  // soporte compartir archivos) se mantiene el flujo anterior (botón de X
+  // solo texto + botón de descargar imagen aparte).
+  const [esMobil, setEsMobil] = useState(false);
   const [puedeCompartirImagen, setPuedeCompartirImagen] = useState(false);
   useEffect(() => {
+    setEsMobil(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
     try {
       const archivoPrueba = new File([""], "test.png", { type: "image/png" });
       setPuedeCompartirImagen(
@@ -763,7 +766,10 @@ function Resultado({ respuestas, onReiniciar }: any) {
       const blob = await (await fetch(dataUrl)).blob();
       const archivo = new File([blob], "que-tan-fanatico-eres.png", { type: "image/png" });
       if ((navigator as any).canShare && (navigator as any).canShare({ files: [archivo] })) {
-        await navigator.share({ files: [archivo], text: textoCompartir } as any);
+        // Con "files" presente, algunos navegadores ignoran el campo "url" aparte,
+        // así que el link va incluido directo en el texto (textoConLink) para
+        // que no se pierda pase lo que pase.
+        await navigator.share({ files: [archivo], text: textoConLink } as any);
       } else {
         // Fallback por si cambió de idea el navegador entre el chequeo inicial y el click.
         await descargarImagen();
@@ -939,7 +945,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
           )}
         </div>
 
-        {puedeCompartirImagen ? (
+        {puedeCompartirImagen && esMobil ? (
           <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 10 }}>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               <button onClick={compartirConImagen} disabled={descargando} style={{

@@ -81,8 +81,9 @@ Diferencias de esquema vs. quetantermo:
 ## Compartir con imagen (share nativo)
 
 - X (`twitter.com/intent/tweet`) no permite adjuntar imagen vía URL en ninguna plataforma - límite de X, no del código. Se mantiene texto + link ahí.
-- Detección por capacidad (`navigator.canShare({ files })`), no por user-agent: en navegadores que lo soportan (Android Chrome, iOS Safari 16.4+), el botón "Compartir" genera la imagen del resultado (misma captura que "Guardar imagen") y abre el share nativo del sistema con el archivo adjunto - ahí el usuario elige X, Instagram, WhatsApp, etc.
-- Donde no hay soporte (desktop, navegadores viejos): se mantiene el flujo anterior, botón de X (solo texto) + botón separado de "Guardar imagen".
+- Detección combinada: capacidad (`navigator.canShare({ files })`) **y** user-agent de teléfono. Windows (Chrome/Edge) también soporta compartir archivos porque tiene su propio panel de share nativo, así que la capacidad sola no alcanza para distinguir mobile de desktop - se agregó chequeo de UA (`Android|iPhone|iPad|iPod`) para que el botón único "Compartir" (con imagen adjunta) solo aparezca en celular.
+- En celular con soporte: el botón "Compartir" genera la imagen del resultado (misma captura que "Guardar imagen") y abre el share nativo del sistema con el archivo adjunto - ahí el usuario elige X, Instagram, WhatsApp, etc. El texto que viaja con el share incluye el link a la web (`textoConLink`), porque algunos navegadores ignoran el parámetro `url` aparte cuando hay `files`.
+- Donde no hay soporte, o es desktop: se mantiene el flujo anterior, botón de X (solo texto) + botón separado de "Guardar imagen".
 
 ## Mecánica del juego
 
