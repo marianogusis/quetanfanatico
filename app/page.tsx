@@ -1138,88 +1138,97 @@ function Resultado({ respuestas, onReiniciar }: any) {
               onClick={(e) => e.stopPropagation()}
               style={{
                 background: "#090c10", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20,
-                maxWidth: 480, width: "100%", maxHeight: "85vh", overflowY: "auto", padding: "24px",
+                maxWidth: 480, width: "100%", maxHeight: "85vh", display: "flex", flexDirection: "column",
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-                <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: "#f1f5f9", letterSpacing: "-0.01em" }}>
-                  🌎 RANKING DE PAÍSES
+              {/* Header fijo: título + texto de "datos anónimos" no se van con el
+                  scroll, para que sigan visibles aunque la lista de países sea larga. */}
+              <div style={{ padding: "24px 24px 0" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+                  <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: "#f1f5f9", letterSpacing: "-0.01em" }}>
+                    🌎 RANKING DE PAÍSES
+                  </div>
+                  <button onClick={() => setMostrarPaises(false)} style={{
+                    background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, cursor: "pointer",
+                    color: "#e2e8f0", fontSize: 16, width: 32, height: 32, lineHeight: 1, flexShrink: 0,
+                  }}>✕</button>
                 </div>
-                <button onClick={() => setMostrarPaises(false)} style={{
-                  background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 8, cursor: "pointer",
-                  color: "#e2e8f0", fontSize: 16, width: 32, height: 32, lineHeight: 1,
-                }}>✕</button>
+
+                <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8", marginBottom: 14, lineHeight: 1.5 }}>
+                  Datos agregados y anónimos de todos los jugadores. Nadie ve resultados individuales acá, solo promedios por país.
+                </p>
               </div>
 
-              <p style={{ fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8", marginBottom: 18, lineHeight: 1.5 }}>
-                Datos agregados y anónimos de todos los jugadores. Nadie ve resultados individuales acá, solo promedios por país.
-              </p>
+              {/* Cuerpo con scroll propio: si la lista de países crece, esto es lo
+                  único que se desplaza, sin tapar el título ni perder el botón de
+                  volver de vista. */}
+              <div style={{ padding: "0 24px 24px", overflowY: "auto", flex: "1 1 auto", minHeight: 0 }}>
+                {cargandoPaises && (
+                  <p style={{ textAlign: "center", fontFamily: "var(--font-body)", color: "#94a3b8", padding: "20px 0" }}>Cargando...</p>
+                )}
 
-              {cargandoPaises && (
-                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", color: "#94a3b8", padding: "20px 0" }}>Cargando...</p>
-              )}
-
-              {errorPaises && (
-                <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: 13, color: "#f87171", padding: "20px 0" }}>
-                  No se pudo cargar el ranking. Intenta de nuevo en un momento.
-                </p>
-              )}
-
-              {datosPaises && (
-                <>
-                  <div style={{ display: "flex", alignItems: "center", fontFamily: "var(--font-mono)", fontSize: 10, color: "#cbd5e1", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                    <div style={{ flex: 1 }}>PAÍS</div>
-                    <div style={{ width: 70, textAlign: "center" }}>FANATISMO</div>
-                    <div style={{ width: 60, textAlign: "right" }}>JUGADORES</div>
-                  </div>
-
-                  {datosPaises.paises.length === 0 ? (
-                    <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", textAlign: "center", padding: "10px 0" }}>
-                      Todavía ningún país llegó a los {datosPaises.minMuestra} jugadores. ¡Compártelo para que tu país aparezca primero!
-                    </p>
-                  ) : (
-                    datosPaises.paises.map((p: any, i: number) => (
-                      <div key={p.pais} style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
-                        <div style={{ flex: 1, display: "flex", alignItems: "center", fontFamily: "var(--font-body)", fontSize: 14, color: "#e2e8f0" }}>
-                          <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#64748b", width: 20, flexShrink: 0 }}>{i + 1}</span>
-                          <BanderaPorCodigoISO codigo={p.pais} />
-                          <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nombrePaisISO(p.pais)}</span>
-                        </div>
-                        <div style={{ width: 70, textAlign: "center", fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: colorFanatismoPromedio(p.promedio) }}>
-                          {Math.round(p.promedio)}
-                        </div>
-                        <div style={{ width: 60, textAlign: "right", fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8" }}>
-                          {p.cantidad.toLocaleString("es")}
-                        </div>
-                      </div>
-                    ))
-                  )}
-
-                  <div style={{ display: "flex", alignItems: "center", marginTop: 4, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
-                    <div style={{ flex: 1, fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 800, color: "#f1f5f9", letterSpacing: "0.02em" }}>
-                      TOTAL
-                    </div>
-                    <div style={{ width: 70, textAlign: "center", fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: "#f1f5f9" }}>
-                      {Math.round(datosPaises.total.promedio)}
-                    </div>
-                    <div style={{ width: 60, textAlign: "right", fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8" }}>
-                      {datosPaises.total.cantidad.toLocaleString("es")}
-                    </div>
-                  </div>
-
-                  <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#64748b", marginTop: 16, marginBottom: 20, lineHeight: 1.5 }}>
-                    Solo se muestran países con al menos {datosPaises.minMuestra} resultados, para que el promedio sea confiable. El total incluye a todos los jugadores, de cualquier país.
+                {errorPaises && (
+                  <p style={{ textAlign: "center", fontFamily: "var(--font-body)", fontSize: 13, color: "#f87171", padding: "20px 0" }}>
+                    No se pudo cargar el ranking. Intenta de nuevo en un momento.
                   </p>
-                </>
-              )}
+                )}
 
-              <button onClick={() => setMostrarPaises(false)} style={{
-                width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)",
-                cursor: "pointer", background: "rgba(255,255,255,0.05)",
-                fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "#e2e8f0",
-              }}>
-                ← Volver a tu resultado
-              </button>
+                {datosPaises && (
+                  <>
+                    <div style={{ display: "flex", alignItems: "center", fontFamily: "var(--font-mono)", fontSize: 10, color: "#cbd5e1", letterSpacing: "0.1em", textTransform: "uppercase", marginBottom: 14, paddingBottom: 10, borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
+                      <div style={{ flex: 1 }}>PAÍS</div>
+                      <div style={{ width: 70, textAlign: "center", marginRight: 16 }}>FANATISMO</div>
+                      <div style={{ width: 60, textAlign: "right" }}>JUGADORES</div>
+                    </div>
+
+                    {datosPaises.paises.length === 0 ? (
+                      <p style={{ fontFamily: "var(--font-body)", fontSize: 13, color: "#94a3b8", textAlign: "center", padding: "10px 0" }}>
+                        Todavía ningún país llegó a los {datosPaises.minMuestra} jugadores. ¡Compártelo para que tu país aparezca primero!
+                      </p>
+                    ) : (
+                      datosPaises.paises.map((p: any, i: number) => (
+                        <div key={p.pais} style={{ display: "flex", alignItems: "center", marginBottom: 12 }}>
+                          <div style={{ flex: 1, display: "flex", alignItems: "center", fontFamily: "var(--font-body)", fontSize: 14, color: "#e2e8f0", minWidth: 0 }}>
+                            <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#64748b", width: 20, flexShrink: 0 }}>{i + 1}</span>
+                            <BanderaPorCodigoISO codigo={p.pais} />
+                            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{nombrePaisISO(p.pais)}</span>
+                          </div>
+                          <div style={{ width: 70, textAlign: "center", marginRight: 16, fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: colorFanatismoPromedio(p.promedio) }}>
+                            {Math.round(p.promedio)}
+                          </div>
+                          <div style={{ width: 60, textAlign: "right", fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8" }}>
+                            {p.cantidad.toLocaleString("es")}
+                          </div>
+                        </div>
+                      ))
+                    )}
+
+                    <div style={{ display: "flex", alignItems: "center", marginTop: 4, paddingTop: 14, borderTop: "1px solid rgba(255,255,255,0.1)" }}>
+                      <div style={{ flex: 1, fontFamily: "var(--font-display)", fontSize: 15, fontWeight: 800, color: "#f1f5f9", letterSpacing: "0.02em" }}>
+                        TOTAL
+                      </div>
+                      <div style={{ width: 70, textAlign: "center", marginRight: 16, fontFamily: "var(--font-display)", fontSize: 18, fontWeight: 800, color: "#f1f5f9" }}>
+                        {Math.round(datosPaises.total.promedio)}
+                      </div>
+                      <div style={{ width: 60, textAlign: "right", fontFamily: "var(--font-body)", fontSize: 12, color: "#94a3b8" }}>
+                        {datosPaises.total.cantidad.toLocaleString("es")}
+                      </div>
+                    </div>
+
+                    <p style={{ fontFamily: "var(--font-body)", fontSize: 11, color: "#64748b", marginTop: 16, marginBottom: 20, lineHeight: 1.5 }}>
+                      Solo se muestran países con al menos {datosPaises.minMuestra} resultados, para que el promedio sea confiable. El total incluye a todos los jugadores, de cualquier país.
+                    </p>
+                  </>
+                )}
+
+                <button onClick={() => setMostrarPaises(false)} style={{
+                  width: "100%", padding: "14px", borderRadius: 12, border: "1px solid rgba(255,255,255,0.12)",
+                  cursor: "pointer", background: "rgba(255,255,255,0.05)",
+                  fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 600, color: "#e2e8f0",
+                }}>
+                  ← Volver a tu resultado
+                </button>
+              </div>
             </div>
           </div>,
           document.body
