@@ -174,6 +174,8 @@ Distribución de perfiles esperada (simulada):
 
 **`/api/count` con `revalidate = 60`**: cachea el count 60 segundos en el edge de Vercel para no martillar Neon con cada visita a la landing.
 
+**Modales con `position: fixed` necesitan `createPortal`**: el wrapper de `Resultado` tiene `transform` inline (animación de entrada, `translateY`), y cualquier ancestro con `transform` crea un "containing block" que rompe `position: fixed` de sus hijos (deja de posicionarse contra el viewport real). El modal del ranking de países se renderiza con `createPortal(..., document.body)` para escapar de ese contenedor. Si se agrega otro modal/overlay dentro de `Resultado` (o de cualquier componente con `transform`/`filter`/`will-change` en un ancestro), usar el mismo patrón.
+
 **Fonts en `page.tsx`**: las Google Fonts están en un `<style>` tag inline dentro del componente, no en `layout.tsx`. Igual que en quetantermo, intencional.
 
 ## Problemas conocidos (heredados de quetantermo, no volver a caer)

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useMemo } from "react";
+import { createPortal } from "react-dom";
 import { track } from "@vercel/analytics";
 import { sendGAEvent } from "@next/third-parties/google";
 
@@ -1125,7 +1126,7 @@ function Resultado({ respuestas, onReiniciar }: any) {
           </button>
         </div>
 
-        {mostrarPaises && (
+        {mostrarPaises && typeof document !== "undefined" && createPortal(
           <div
             onClick={() => setMostrarPaises(false)}
             style={{
@@ -1220,7 +1221,8 @@ function Resultado({ respuestas, onReiniciar }: any) {
                 ← Volver a tu resultado
               </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
 
         <div style={{ textAlign: "center", marginTop: 24, paddingTop: 20, borderTop: "1px solid rgba(255,255,255,0.06)" }}>
